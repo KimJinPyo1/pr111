@@ -102,7 +102,7 @@ export default function Page() {
    *  vacant   → 비어있음 (초록)
    */
   const getState = (room) => {
-    if (!today || !now) return { kind: "vacant", note: "사용 가능" };
+    if (!today || !now) return { kind: "vacant", note: "" };
 
     const list = room.schedule[today] || [];
     const { inClass, periods, nextPeriods } = timeInfo;
@@ -115,7 +115,7 @@ export default function Page() {
       const after = list.filter((p) => p > periods[0].p).sort((a, b) => a - b)[0];
       return {
         kind: "vacant",
-        note: after ? `${after}교시부터 수업 있음` : "오늘 남은 수업 없음",
+        note: after ? `${after}교시부터 수업 있음` : "",
       };
     }
 
@@ -133,7 +133,7 @@ export default function Page() {
     const after = list.filter((p) => p > nextNo).sort((a, b) => a - b)[0];
     return {
       kind: "vacant",
-      note: after ? `${after}교시부터 수업 있음` : "오늘 남은 수업 없음",
+      note: after ? `${after}교시부터 수업 있음` : "",
     };
   };
 
@@ -352,7 +352,9 @@ export default function Page() {
                   <span style={{ ...S.status, color: theme.text }}>
                     {theme.label}
                   </span>
-                  <span style={S.statusSub}>{st.note}</span>
+                  {st.note ? (
+                    <span style={S.statusSub}>{st.note}</span>
+                  ) : null}
                 </div>
               </div>
             );
@@ -571,7 +573,9 @@ const S = {
     padding: "10px 13px 12px",
     display: "flex",
     flexDirection: "column",
+    justifyContent: "center",
     gap: 2,
+    minHeight: 56,
   },
   status: { fontSize: 13.5, fontWeight: 700 },
   statusSub: { fontSize: 11.5, color: "#8A93A0" },
