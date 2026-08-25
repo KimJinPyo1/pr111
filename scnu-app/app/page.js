@@ -14,6 +14,12 @@ const toMin = (hhmm) => {
 
 const roomKey = (building, no) => `${building}::${no}`;
 
+// 교시 번호로 시작 시각을 찾는다 (예: 11 → "18:00")
+const periodStart = (p) => {
+  const found = PERIODS.find((x) => x.p === p);
+  return found ? found.start : null;
+};
+
 /**
  * 현재 시각을 교시 정보로 환산한다.
  *  - inClass: 지금이 수업 시간인지 (쉬는시간이면 false)
@@ -110,12 +116,12 @@ export default function Page() {
     if (inClass) {
       const hit = periods.find((p) => list.includes(p.p));
       if (hit) {
-        return { kind: "occupied", note: `${hit.p}교시 수업 중 (~${hit.end})` };
+        return { kind: "occupied", note: `${hit.end}까지 수업 중` };
       }
       const after = list.filter((p) => p > periods[0].p).sort((a, b) => a - b)[0];
       return {
         kind: "vacant",
-        note: after ? `${after}교시부터 수업 있음` : "",
+        note: after ? `${periodStart(after)}부터 수업 있음` : "",
       };
     }
 
@@ -125,7 +131,7 @@ export default function Page() {
       const mins = toMin(soonHit.start) - (now.getHours() * 60 + now.getMinutes());
       return {
         kind: "soon",
-        note: `${mins}분 뒤 ${soonHit.p}교시 수업 시작`,
+        note: `${mins}분 뒤 ${soonHit.start} 수업 시작`,
       };
     }
 
@@ -133,7 +139,7 @@ export default function Page() {
     const after = list.filter((p) => p > nextNo).sort((a, b) => a - b)[0];
     return {
       kind: "vacant",
-      note: after ? `${after}교시부터 수업 있음` : "",
+      note: after ? `${periodStart(after)}부터 수업 있음` : "",
     };
   };
 
@@ -263,9 +269,8 @@ export default function Page() {
 
       {now && today && !timeInfo.inClass && timeInfo.nextPeriods.length > 0 && (
         <div style={S.breakNotice}>
-          지금은 쉬는시간입니다. 다음 교시({timeInfo.nextPeriods[0].p}교시,{" "}
-          {timeInfo.nextPeriods[0].start} 시작)에 수업이 있는 강의실은 노란색으로
-          표시됩니다.
+          지금은 쉬는시간입니다. 다음 수업은 {timeInfo.nextPeriods[0].start}에
+          시작하며, 그 시간에 수업이 있는 강의실은 노란색으로 표시됩니다.
         </div>
       )}
 
